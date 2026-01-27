@@ -41,8 +41,18 @@ export default async function LaporanIuran2026Page() {
    * 3. Build PAID list
    */
   const paidPayments =
-    payments?.filter((p) => p.paid) ?? []
-
+    payments?.filter((p) => p.paid).map((p) => ({
+      id: p.id,
+      paid: true,
+      amount: p.amount,
+      year: p.year,
+      received_at: p.received_at,
+      notes: p.notes,
+      cluster_addresses: {
+        block: p.cluster_addresses?.[0]?.block ?? '',
+        house_number: p.cluster_addresses?.[0]?.house_number ?? '',
+      },
+    })) ?? []
   /**
    * 4. Determine which addresses already have ANY iuran record
    */
