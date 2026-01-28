@@ -68,7 +68,7 @@ export default function PaymentListClient({
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium">
-                    Blok {item.cluster_addresses.block} No.{' '}
+                    Blok {item.cluster_addresses.block}{' / '}
                     {item.cluster_addresses.house_number}
                   </p>
                   <p className="text-xs text-gray-500">
