@@ -28,8 +28,7 @@ export default function RootLayout({
           {children}
         </div>
 
-        {/* Floating Footer */}
-        <FloatingFooter />
+        
       </body>
     </html>
   )
