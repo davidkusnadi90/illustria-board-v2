@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { Open_Sans } from 'next/font/google'
-import FloatingFooter from '@/components/FloatingFooter'
+
 
 const openSans = Open_Sans({
   subsets: ['latin'],
