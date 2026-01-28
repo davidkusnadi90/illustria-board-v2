@@ -155,4 +155,11 @@ export default async function LaporanPenggunaanAnggaranPage() {
         ))}
 
         {expenses.length === 0 && (
-          <div className="rounded-xl border bg-white p-4 shadow-sm text-center text-sm
+          <div className="rounded-xl border bg-white p-4 shadow-sm text-center text-sm text-gray-500">
+            Belum ada data pengeluaran
+          </div>
+        )}
+      </section>
+    </main>
+  )
+}
