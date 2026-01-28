@@ -46,6 +46,13 @@ export default async function DashboardPage() {
             >
               🎁 Laporan THR 2026
             </a>
+
+            <a
+              href="/laporan/penggunaan-anggaran"
+              className="inline-flex items-center justify-center rounded-lg bg-white text-emerald-700 px-6 py-3 font-medium shadow hover:bg-emerald-50 transition"
+            >
+              💸 Laporan Anggaran 
+            </a>
           </div>
         </div>
       </section>
