@@ -71,9 +71,7 @@ export default function PaymentListClient({
                     Blok {item.cluster_addresses.block}{' / '}
                     {item.cluster_addresses.house_number}
                   </p>
-                  <p className="text-xs text-gray-500">
-                    THR Tahun {item.year}
-                  </p>
+                  
                 </div>
 
                 {item.paid ? (
