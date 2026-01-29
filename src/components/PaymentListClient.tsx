@@ -65,9 +65,9 @@ export default function PaymentListClient({
     })
   }
 
-  const displayedPayments = showPaid
-    ? sortPayments(paidPayments, sortBy)
-    : unpaidPayments
+const displayedPayments = showPaid
+  ? sortPayments(paidPayments, sortBy)
+  : sortPayments(unpaidPayments, 'block')
 
   return (
     <section className="space-y-4">
