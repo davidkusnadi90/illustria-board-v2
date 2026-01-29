@@ -2,39 +2,82 @@
 
 import { useState } from 'react'
 
-type PaymentLike = {
-  id: string | number
+type ClusterAddress = {
+  block: string
+  house_number: string
+}
+
+type Payment = {
+  id: number | string
   paid: boolean
   amount: number
   year: number
   received_at: string | null
   notes: string | null
-  cluster_addresses: {
-    block: string
-    house_number: string
-  }
+  cluster_addresses: ClusterAddress
+}
+
+type SortOption =
+  | 'block'
+  | 'received_desc'
+
+type Props = {
+  paidPayments: Payment[]
+  unpaidPayments: Payment[]
 }
 
 export default function PaymentListClient({
   paidPayments,
   unpaidPayments,
-}: {
-  paidPayments: PaymentLike[]
-  unpaidPayments: PaymentLike[]
-}) {
-  const [filter, setFilter] = useState<'paid' | 'unpaid'>('paid')
+}: Props) {
+  const [showPaid, setShowPaid] = useState(true)
+  const [sortBy, setSortBy] = useState<SortOption>('block')
 
-  const list = filter === 'paid' ? paidPayments : unpaidPayments
+  function sortPayments(
+    payments: Payment[],
+    sortBy: SortOption
+  ) {
+    return [...payments].sort((a, b) => {
+      // 1️⃣ Sort by Block + House Number
+      if (sortBy === 'block') {
+        const blockA = a.cluster_addresses.block
+        const blockB = b.cluster_addresses.block
+
+        if (blockA !== blockB) {
+          return blockA.localeCompare(blockB)
+        }
+
+        return (
+          Number(a.cluster_addresses.house_number) -
+          Number(b.cluster_addresses.house_number)
+        )
+      }
+
+      // 2️⃣ Sort by received_at DESC (newest first)
+      if (sortBy === 'received_desc') {
+        return (
+          new Date(b.received_at!).getTime() -
+          new Date(a.received_at!).getTime()
+        )
+      }
+
+      return 0
+    })
+  }
+
+  const displayedPayments = showPaid
+    ? sortPayments(paidPayments, sortBy)
+    : unpaidPayments
 
   return (
     <section className="space-y-4">
-      {/* Filter Buttons */}
+      {/* Paid / Unpaid Toggle */}
       <div className="flex gap-2">
         <button
-          onClick={() => setFilter('paid')}
+          onClick={() => setShowPaid(true)}
           className={`flex-1 rounded-full px-4 py-2 text-sm font-medium transition
             ${
-              filter === 'paid'
+              showPaid
                 ? 'bg-emerald-600 text-white'
                 : 'bg-gray-100 text-gray-600'
             }
@@ -44,10 +87,10 @@ export default function PaymentListClient({
         </button>
 
         <button
-          onClick={() => setFilter('unpaid')}
+          onClick={() => setShowPaid(false)}
           className={`flex-1 rounded-full px-4 py-2 text-sm font-medium transition
             ${
-              filter === 'unpaid'
+              !showPaid
                 ? 'bg-red-600 text-white'
                 : 'bg-gray-100 text-gray-600'
             }
@@ -57,59 +100,88 @@ export default function PaymentListClient({
         </button>
       </div>
 
-      {/* List */}
+      {/* Sorting (only for paid) */}
+      {showPaid && (
+        <div className="flex gap-2">
+          <button
+            onClick={() => setSortBy('block')}
+            className={`flex-1 rounded-full px-4 py-2 text-sm font-medium transition
+              ${
+                sortBy === 'block'
+                  ? 'bg-emerald-600 text-white'
+                  : 'bg-gray-100 text-gray-600'
+              }
+            `}
+          >
+            Blok / Rumah
+          </button>
+
+          <button
+            onClick={() => setSortBy('received_desc')}
+            className={`flex-1 rounded-full px-4 py-2 text-sm font-medium transition
+              ${
+                sortBy === 'received_desc'
+                  ? 'bg-emerald-600 text-white'
+                  : 'bg-gray-100 text-gray-600'
+              }
+            `}
+          >
+            Terbaru
+          </button>
+        </div>
+      )}
+
+      {/* Payment Cards */}
       <div className="space-y-3">
-        {list.length > 0 ? (
-          list.map((item) => (
-            <div
-              key={item.id}
-              className="rounded-xl border bg-white p-4 shadow-sm space-y-2"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">
-                    Blok {item.cluster_addresses.block}{' / '}
-                    {item.cluster_addresses.house_number}
-                  </p>
-                  
-                </div>
-
-                {item.paid ? (
-                  <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">
-                    Lunas
-                  </span>
-                ) : (
-                  <span className="rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-700">
-                    Belum Bayar
-                  </span>
-                )}
-              </div>
-
-              <div className="flex justify-between text-sm">
-                <p className="text-gray-600">Jumlah</p>
+        {displayedPayments.map((p) => (
+          <div
+            key={p.id}
+            className="rounded-xl border bg-white p-4 shadow-sm space-y-2"
+          >
+            <div className="flex items-center justify-between">
+              <div>
                 <p className="font-medium">
-                  Rp {item.amount.toLocaleString('id-ID')}
+                  Blok {p.cluster_addresses.block} /{' '}
+                  {p.cluster_addresses.house_number}
+                </p>
+                <p className="text-xs text-gray-500">
+                  Iuran Tahun {p.year}
                 </p>
               </div>
 
-              {item.received_at && (
-                <p className="text-xs text-gray-500">
-                  Dibayar pada:{' '}
-                  {new Date(item.received_at).toLocaleDateString('id-ID')}
-                </p>
-              )}
-
-              {item.notes && (
-                <p className="text-xs text-gray-500">
-                  Catatan: {item.notes}
-                </p>
+              {p.paid && (
+                <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">
+                  Lunas
+                </span>
               )}
             </div>
-          ))
-        ) : (
-          <p className="text-sm text-gray-500 text-center py-6">
-            Tidak ada data.
-          </p>
+
+            <div className="flex justify-between text-sm">
+              <p className="text-gray-600">Jumlah</p>
+              <p className="font-medium">
+                Rp {p.amount.toLocaleString('id-ID')}
+              </p>
+            </div>
+
+            {p.received_at && (
+              <p className="text-xs text-gray-500">
+                Dibayar pada:{' '}
+                {new Date(p.received_at).toLocaleDateString('id-ID')}
+              </p>
+            )}
+
+            {p.notes && (
+              <p className="text-xs text-gray-500">
+                Catatan: {p.notes}
+              </p>
+            )}
+          </div>
+        ))}
+
+        {displayedPayments.length === 0 && (
+          <div className="rounded-xl border bg-white p-4 shadow-sm text-center text-sm text-gray-500">
+            Tidak ada data
+          </div>
         )}
       </div>
     </section>
